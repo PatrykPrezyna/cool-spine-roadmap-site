@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Cool Spine Roadmap</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: flex;
+      flex-direction: column;
+      color: #1c2430;
+      background: #f6f7f9;
+      font: 13px/1.4 "Segoe UI", "Helvetica Neue", sans-serif;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px 24px;
+      padding: 12px 16px;
+      background: #fff;
+      border-bottom: 1px solid #e3e8ee;
+    }
+    h1 { margin: 0; font-size: 18px; font-weight: 650; letter-spacing: -0.01em; }
+    .toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 8px;
+      color: #5c6b7a;
+    }
+    .filter-label { font-size: 12px; }
+    .sep { width: 1px; height: 18px; background: #d5dbe3; }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    button.pill {
+      border: 0;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button.pill[aria-pressed="false"] {
+      background: transparent;
+      color: #8b97a3;
+      box-shadow: inset 0 0 0 1px #d5dbe3;
+    }
+    button.cmd {
+      font: inherit;
+      cursor: pointer;
+      border: 1px solid #d5dbe3;
+      background: #fff;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 650;
+      color: #1c2430;
+    }
+    button.cmd:hover { border-color: #1a4478; color: #1a4478; }
+    .pill.done { background: #e7f2ea; color: #1e5a38; }
+    .pill.in_progress { background: #e6effa; color: #1a4478; }
+    .pill.future { background: #eef0f3; color: #4b5563; }
+    #error {
+      margin: 0;
+      padding: 8px 16px;
+      background: #fdecec;
+      color: #8a1f1f;
+    }
+    #error[hidden] { display: none; }
+    #scroller { flex: 1; min-height: 0; overflow: auto; background: #fff; }
+    table { width: max-content; border-collapse: separate; border-spacing: 0; }
+    thead th {
+      position: sticky;
+      background: #fff;
+      z-index: 4;
+    }
+    thead tr:first-child th.year { top: 0; height: 26px; }
+    thead tr.quarters th {
+      top: 26px;
+      height: 22px;
+      padding: 0;
+      font-size: 11px;
+      font-weight: 650;
+      color: #3d4d5e;
+      text-align: left;
+      border-bottom: 1px solid #e3e8ee;
+    }
+    thead tr.quarters th.quarter { border-right: 1px solid #eef1f4; }
+    thead tr.filters th {
+      top: 48px;
+      height: 28px;
+      padding: 0 3px;
+      vertical-align: middle;
+      border-bottom: 1px solid #e3e8ee;
+    }
+    thead tr.filters th.name-col { padding-left: 12px; font-weight: 650; }
+    thead tr.filters th.name-col.on { color: #1a4478; }
+    thead tr:last-child th { top: 76px; height: 40px; }
+    th.name-col { top: 0; }
+    th.name-col, td.name-col {
+      position: sticky;
+      left: 0;
+      width: 380px;
+      min-width: 380px;
+      max-width: 380px;
+      z-index: 5;
+      border-right: 1px solid #d5dbe3;
+      box-shadow: 4px 0 8px rgba(20, 30, 40, 0.04);
+    }
+    th.name-col { z-index: 6; text-align: left; padding-left: 12px; font-size: 12px; color: #5c6b7a; }
+    button.sprint-filter {
+      display: block;
+      width: 100%;
+      height: 16px;
+      padding: 0;
+      border: 1px solid #d5dbe3;
+      border-radius: 999px;
+      background: #fff;
+      cursor: pointer;
+    }
+    button.sprint-filter:hover { border-color: #1a4478; }
+    button.sprint-filter[aria-pressed="true"] {
+      background: #1a4478;
+      border-color: #1a4478;
+    }
+    th.sprint.picked { box-shadow: inset 0 -3px 0 #1a4478; }
+    th.year {
+      text-align: left;
+      padding: 0;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1c2430;
+      border-bottom: 1px solid #e3e8ee;
+      z-index: 4;
+    }
+    .year-label, .quarter-label {
+      position: sticky;
+      left: 392px;
+      display: inline-block;
+      background: #fff;
+    }
+    .year-label { padding: 4px 12px 4px 8px; }
+    .quarter-label { padding: 2px 10px 2px 8px; }
+    th.sprint {
+      width: 36px;
+      min-width: 36px;
+      padding: 4px 0 6px;
+      font-size: 10px;
+      font-weight: 600;
+      line-height: 1.15;
+      color: #5c6b7a;
+      vertical-align: bottom;
+      border-bottom: 1px solid #e3e8ee;
+      border-right: 1px solid #eef1f4;
+    }
+    th.sprint .day { display: block; color: #1c2430; font-size: 12px; font-variant-numeric: tabular-nums; }
+    th.sprint.current { background: #e7f0fa; }
+    th.sprint.current .day { color: #1a4478; }
+    td.sprint, th.sprint { user-select: none; }
+    td.sprint {
+      height: 36px;
+      padding: 0;
+      text-align: center;
+      vertical-align: middle;
+      border-bottom: 1px solid #e6ebf0;
+      border-right: 1px solid #eef1f4;
+    }
+    td.name-col { border-bottom: 1px solid #e6ebf0; background: #fff; }
+    tr.epic td { background: #e8eef5; }
+    tr.epic td.name-col { background: #e8eef5; }
+    tr.task td.current { background: #f3f7fc; }
+    tr.task:hover td.name-col { background: #f7f8fa; }
+    tr.task td.sprint { cursor: pointer; }
+    tr.task td.sprint:hover { background: #f4f6f8; }
+    tr.milestone td.sprint { cursor: pointer; }
+    tr.milestone td.current { background: #f3f7fc; }
+    tr.milestone td.sprint:hover, tr.milestone td.preview { background: #fff4e8; }
+    tr.task.status-done td.preview { background: #e7f2ea; }
+    tr.task.status-in_progress td.preview { background: #e6effa; }
+    tr.task.status-future td.preview { background: #eef0f3; }
+    tr.task td.anchor { box-shadow: inset 0 0 0 2px #1a4478; }
+    .mark { display: block; height: 10px; }
+    tr.task.status-done td.in-bar .mark { background: #1e5a38; }
+    tr.task.status-in_progress td.in-bar .mark { background: #1a4478; }
+    tr.task.status-future td.in-bar .mark { background: #4b5563; }
+    tr.task td.single .mark, tr.epic td.single .mark { margin: 0 4px; border-radius: 6px; }
+    tr.task td.bar-start .mark, tr.epic td.bar-start .mark { margin-left: 4px; border-radius: 6px 0 0 6px; }
+    tr.task td.bar-end .mark, tr.epic td.bar-end .mark { margin-right: 4px; border-radius: 0 6px 6px 0; }
+    tr.epic td.sprint { position: relative; }
+    tr.epic td.sprint .gem {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 1;
+      margin: -4.5px 0 0 -4.5px;
+    }
+    .name-inner { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 8px 0 10px; }
+    button.grip {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 22px;
+      margin-left: -6px;
+      padding: 0;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      color: #8b97a3;
+      cursor: grab;
+      touch-action: none;
+    }
+    button.grip:hover { background: #e6ebf0; color: #3d4d5e; }
+    .grip-dots {
+      width: 8px;
+      height: 12px;
+      background: radial-gradient(circle, currentColor 1.15px, transparent 1.25px) 0 0 / 4px 4px;
+    }
+    body.dragging { cursor: grabbing; user-select: none; }
+    body.dragging button.grip { cursor: grabbing; }
+    tr.dragging td { opacity: 0.45; }
+    tr.drop-before td.name-col { box-shadow: inset 0 3px 0 #1a4478, 4px 0 8px rgba(20, 30, 40, 0.04); }
+    tr.drop-after td.name-col { box-shadow: inset 0 -3px 0 #1a4478, 4px 0 8px rgba(20, 30, 40, 0.04); }
+    .drag-ghost {
+      position: fixed;
+      z-index: 20;
+      max-width: 280px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: #1a4478;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 650;
+      pointer-events: none;
+      box-shadow: 0 6px 16px rgba(20, 30, 40, 0.18);
+    }
+    .label {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    tr.epic .label { font-weight: 700; cursor: pointer; }
+    button.fold {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      margin-left: -4px;
+      padding: 0;
+      border: 0;
+      border-radius: 4px;
+      background: transparent;
+      cursor: pointer;
+    }
+    button.fold:hover { background: #d5deea; }
+    .chevron {
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid #3d4d5e;
+    }
+    tr.epic.folded .chevron {
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-left: 5px solid #3d4d5e;
+      border-right: 0;
+    }
+    .count {
+      flex: 0 0 auto;
+      font-size: 11px;
+      font-weight: 650;
+      font-variant-numeric: tabular-nums;
+      color: #5c6b7a;
+    }
+    button.name, button.add, button.clear {
+      font: inherit;
+      cursor: pointer;
+    }
+    button.name {
+      appearance: none;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+    button.name:hover { text-decoration: underline; text-underline-offset: 2px; }
+    input.name {
+      flex: 1;
+      min-width: 0;
+      font: inherit;
+      border: 1px solid #1a4478;
+      border-radius: 4px;
+      padding: 3px 6px;
+    }
+    button.add, button.clear {
+      flex: 0 0 auto;
+      border: 1px solid #d5dbe3;
+      background: #fff;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 650;
+      color: #1c2430;
+    }
+    button.add:hover, button.clear:hover { border-color: #1a4478; color: #1a4478; }
+    .tag {
+      flex: 0 0 auto;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #9a3412;
+      background: #fff4e8;
+      border-radius: 999px;
+      padding: 2px 6px;
+    }
+    .gem {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      background: #c2410c;
+      transform: rotate(45deg);
+    }
+    tr.flash td.name-col { background: #e7f6df; }
+    button:focus-visible, select:focus-visible, input:focus-visible {
+      outline: 2px solid #1a4478;
+      outline-offset: 1px;
+    }
+    select.status, span.status {
+      flex: 0 0 auto;
+      border: 0;
+      border-radius: 999px;
+      padding: 3px 6px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    select.status { cursor: pointer; }
+    span.status { cursor: default; }
+    select.status[data-status="done"], span.status[data-status="done"] { background: #e7f2ea; color: #1e5a38; }
+    select.status[data-status="in_progress"], span.status[data-status="in_progress"] { background: #e6effa; color: #1a4478; }
+    select.status[data-status="future"], span.status[data-status="future"] { background: #eef0f3; color: #4b5563; }
+    .task-label {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .as-of { margin: 2px 0 0; color: #5c6b7a; font-size: 12px; }
+    body.viewer tr.task td.sprint,
+    body.viewer tr.milestone td.sprint { cursor: default; }
+    body.viewer tr.task td.sprint:hover { background: transparent; }
+    body.viewer tr.task td.current:hover,
+    body.viewer tr.milestone td.current:hover { background: #f3f7fc; }
+    body.saving #scroller { pointer-events: none; }
+    #app {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    #app[hidden] { display: none; }
+    #gate {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    #gate[hidden] { display: none; }
+    #gate form {
+      width: min(100%, 360px);
+      background: #fff;
+      border: 1px solid #e3e8ee;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    #gate h2 { margin: 0 0 8px; font-size: 18px; font-weight: 650; }
+    #gate p { margin: 0 0 16px; color: #5c6b7a; }
+    #gate input {
+      width: 100%;
+      font: inherit;
+      padding: 8px 10px;
+      border: 1px solid #d5dbe3;
+      border-radius: 8px;
+      color: #1c2430;
+    }
+    #gate button { margin-top: 12px; }
+    #gate-error { margin: 12px 0 0; color: #8a1f1f; }
+  </style>
+</head>
+<body>
+  <div id="gate" hidden>
+    <form id="gate-form">
+      <h2>Cool Spine Roadmap</h2>
+      <p>Enter the password to view the schedule.</p>
+      <input id="gate-password" type="password" name="password" autocomplete="current-password" required>
+      <button type="submit" class="cmd">View roadmap</button>
+      <p id="gate-error" hidden></p>
+    </form>
+  </div>
+  <div id="app">
+  <header>
+    <div>
+      <h1 id="title">Cool Spine Roadmap</h1>
+      <p id="as-of" class="as-of" hidden></p>
+    </div>
+    <div class="toolbar">
+      <button type="button" id="lock" class="cmd" hidden>Lock</button>
+      <button type="button" id="fold-all" class="cmd">Fold all</button>
+      <button type="button" id="unfold-all" class="cmd">Unfold all</button>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="filter-label">Show</span>
+      <button type="button" class="pill done" data-status="done" aria-pressed="true" title="Show only done tasks. Click another status to add it.">Done</button>
+      <button type="button" class="pill in_progress" data-status="in_progress" aria-pressed="true" title="Show only in-progress tasks. Click another status to add it.">In progress</button>
+      <button type="button" class="pill future" data-status="future" aria-pressed="true" title="Show only future tasks. Click another status to add it.">Future</button>
+      <span class="sep" aria-hidden="true"></span>
+      <span class="legend-item"><span class="gem"></span> Milestone</span>
+    </div>
+  </header>
+  <p id="error" hidden></p>
+  <div id="scroller">
+    <table>
+      <thead id="head"></thead>
+      <tbody id="body"></tbody>
+    </table>
+  </div>
+  </div>
+  <script>
+    const BOOT = null;
+    const VIEWER = true;
+    const SEALED = {"iterations": 600000, "salt": "BW8jb6F5CdiiHUvzs6fgGw==", "iv": "/jjwfRHTVu6qa+gL", "data": "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"};
+    const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const STATUSES = [
+      ["done", "Done"],
+      ["in_progress", "In progress"],
+      ["future", "Future"]
+    ];
+    const STATUS_BAR = {
+      done: "#1e5a38",
+      in_progress: "#1a4478",
+      future: "#4b5563"
+    };
+    const state = {
+      roadmap: null,
+      anchor: null,
+      scrolled: false,
+      folded: new Set(),
+      statuses: new Set(),
+      sprintId: null
+    };
+
+    const titleEl = document.getElementById("title");
+    const errorEl = document.getElementById("error");
+    const headEl = document.getElementById("head");
+    const bodyEl = document.getElementById("body");
+    const scrollerEl = document.getElementById("scroller");
+
+    function showError(message) {
+      errorEl.hidden = false;
+      errorEl.textContent = message;
+    }
+
+    function clearError() {
+      errorEl.hidden = true;
+      errorEl.textContent = "";
+    }
+
+    async function api(method, url, body) {
+      const response = await fetch(url, {
+        method,
+        headers: body ? { "Content-Type": "application/json" } : undefined,
+        body: body ? JSON.stringify(body) : undefined
+      });
+      const text = await response.text();
+      let data = {};
+      if (text) {
+        try { data = JSON.parse(text); } catch { data = { error: text }; }
+      }
+      if (!response.ok) throw new Error(data.error || "Save failed");
+      return data;
+    }
+
+    function findItem(id) {
+      for (const epic of state.roadmap.epics) {
+        for (const item of epic.items) {
+          if (item.id === id) return item;
+        }
+      }
+      return null;
+    }
+
+    function sprintLabel(iso) {
+      const [, month, day] = iso.split("-");
+      return MONTHS[Number(month) - 1] + " " + Number(day);
+    }
+
+    function quarterKey(iso) {
+      const quarter = Math.floor((Number(iso.slice(5, 7)) - 1) / 3) + 1;
+      return iso.slice(0, 4) + "-Q" + quarter;
+    }
+
+    function barEdges(start, end, sprintId) {
+      if (!start || !end || sprintId < start || sprintId > end) return "";
+      if (start === end) return "in-bar single";
+      if (sprintId === start) return "in-bar bar-start";
+      if (sprintId === end) return "in-bar bar-end";
+      return "in-bar";
+    }
+
+    function sprintFlags(sprint, data) {
+      return (sprint.id === data.today_sprint ? " current" : "") + (sprint.id === state.sprintId ? " picked" : "");
+    }
+
+    function coversSprint(item, sprintId) {
+      return !!item.start && !!item.end && item.start <= sprintId && sprintId <= item.end;
+    }
+
+    function buildHead(data) {
+      headEl.replaceChildren();
+      const yearRow = document.createElement("tr");
+      const corner = document.createElement("th");
+      corner.className = "name-col";
+      corner.textContent = "Task";
+      yearRow.append(corner);
+      let previousYear = "";
+      for (const sprint of data.sprints) {
+        const year = sprint.id.slice(0, 4);
+        if (year !== previousYear) {
+          const cell = document.createElement("th");
+          cell.className = "year";
+          cell.colSpan = data.sprints.filter((item) => item.id.slice(0, 4) === year).length;
+          const label = document.createElement("span");
+          label.className = "year-label";
+          label.textContent = year;
+          cell.append(label);
+          yearRow.append(cell);
+          previousYear = year;
+        }
+      }
+      const quarterRow = document.createElement("tr");
+      quarterRow.className = "quarters";
+      const quarterCorner = document.createElement("th");
+      quarterCorner.className = "name-col";
+      quarterRow.append(quarterCorner);
+      let previousQuarter = "";
+      for (const sprint of data.sprints) {
+        const key = quarterKey(sprint.id);
+        if (key !== previousQuarter) {
+          const cell = document.createElement("th");
+          cell.className = "quarter";
+          cell.colSpan = data.sprints.filter((item) => quarterKey(item.id) === key).length;
+          cell.title = key.slice(5) + " " + key.slice(0, 4);
+          const label = document.createElement("span");
+          label.className = "quarter-label";
+          label.textContent = key.slice(5);
+          cell.append(label);
+          quarterRow.append(cell);
+          previousQuarter = key;
+        }
+      }
+      const filterRow = document.createElement("tr");
+      filterRow.className = "filters";
+      const filterLabel = document.createElement("th");
+      filterLabel.className = "name-col";
+      filterLabel.id = "sprint-filter-label";
+      filterLabel.textContent = "Current sprint";
+      filterRow.append(filterLabel);
+      for (const sprint of data.sprints) {
+        const cell = document.createElement("th");
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "sprint-filter";
+        button.dataset.sprint = sprint.id;
+        const range = sprintLabel(sprint.id) + " – " + sprintLabel(sprint.last_day) + ", " + sprint.id.slice(0, 4);
+        button.title = "Current sprint: show tasks with duration in " + range + ". Click again to show every task.";
+        button.setAttribute("aria-label", "Current sprint, " + range);
+        button.addEventListener("click", () => {
+          state.sprintId = state.sprintId === sprint.id ? null : sprint.id;
+          state.anchor = null;
+          preserveRender();
+        });
+        cell.append(button);
+        filterRow.append(cell);
+      }
+      const sprintRow = document.createElement("tr");
+      const dateCorner = document.createElement("th");
+      dateCorner.className = "name-col";
+      sprintRow.append(dateCorner);
+      for (const sprint of data.sprints) {
+        const cell = document.createElement("th");
+        cell.className = "sprint" + sprintFlags(sprint, data);
+        cell.dataset.sprint = sprint.id;
+        cell.title = sprintLabel(sprint.id) + " – " + sprintLabel(sprint.last_day) + ", " + sprint.id.slice(0, 4);
+        const day = document.createElement("span");
+        day.className = "day";
+        day.textContent = String(Number(sprint.id.slice(8, 10)));
+        const month = document.createElement("span");
+        month.textContent = MONTHS[Number(sprint.id.slice(5, 7)) - 1];
+        cell.append(day, month);
+        sprintRow.append(cell);
+      }
+      headEl.append(yearRow, quarterRow, filterRow, sprintRow);
+    }
+
+    function statusVisible(status) {
+      return state.statuses.size === 0 || state.statuses.has(status);
+    }
+
+    function taskShown(item) {
+      if (item.kind !== "task" || !statusVisible(item.status)) return false;
+      if (!state.sprintId) return true;
+      return coversSprint(item, state.sprintId);
+    }
+
+    function milestoneShown(item, sprints) {
+      if (!state.sprintId) return true;
+      return sprintForDate(sprints, item.date) === state.sprintId;
+    }
+
+    function buildBody(data) {
+      const fragment = document.createDocumentFragment();
+      const milestones = [];
+      for (const epic of data.epics) {
+        for (const item of epic.items) {
+          if (item.kind === "milestone") milestones.push(item);
+        }
+        if (epic.id === "milestones") continue;
+        const shown = epic.items.some((item) => taskShown(item));
+        if (state.sprintId && !shown) continue;
+        const folded = state.folded.has(epic.id);
+        fragment.append(epicRow(epic, data, folded));
+        if (folded) continue;
+        for (const item of epic.items) {
+          if (item.kind !== "milestone" && taskShown(item)) fragment.append(taskRow(item, data, epic.id));
+        }
+      }
+      const visibleMilestones = milestones.filter((item) => milestoneShown(item, data.sprints));
+      if (visibleMilestones.length) fragment.append(milestoneSection(visibleMilestones, data));
+      bodyEl.replaceChildren(fragment);
+    }
+
+    function coveredSpan(epic) {
+      let start = null;
+      let end = null;
+      let count = 0;
+      for (const item of epic.items) {
+        if (!taskShown(item) || !item.start || !item.end) continue;
+        count += 1;
+        if (start === null || item.start < start) start = item.start;
+        if (end === null || item.end > end) end = item.end;
+      }
+      if (!start) return null;
+      return { start, end, label: count === 1 ? "1 task" : count + " tasks" };
+    }
+
+    function coveringStatuses(epic, sprintId) {
+      const found = [];
+      for (const item of epic.items) {
+        if (!taskShown(item) || !coversSprint(item, sprintId) || found.includes(item.status)) continue;
+        found.push(item.status);
+      }
+      return found;
+    }
+
+    function statusPaint(statuses) {
+      const order = ["done", "in_progress", "future"].filter((status) => statuses.includes(status));
+      if (order.length === 1) return STATUS_BAR[order[0]];
+      return "linear-gradient(90deg, " + order.map((status, index) => {
+        const start = (index / order.length) * 100;
+        const end = ((index + 1) / order.length) * 100;
+        return STATUS_BAR[status] + " " + start + "% " + end + "%";
+      }).join(", ") + ")";
+    }
+
+    function epicRow(epic, data, folded) {
+      const row = document.createElement("tr");
+      row.className = "epic" + (folded ? " folded" : "");
+      row.dataset.epic = epic.id;
+      row.append(nameCell(epicName(epic, folded)));
+      const span = folded ? coveredSpan(epic) : null;
+      for (const sprint of data.sprints) {
+        const statuses = folded ? coveringStatuses(epic, sprint.id) : [];
+        const edges = statuses.length && span ? barEdges(span.start, span.end, sprint.id) : "";
+        const cell = document.createElement("td");
+        cell.className = "sprint" + (edges ? " " + edges : "") + sprintFlags(sprint, data);
+        if (edges) {
+          const mark = document.createElement("span");
+          mark.className = "mark";
+          mark.style.background = statusPaint(statuses);
+          cell.title = span.label;
+          cell.append(mark);
+        }
+        row.append(cell);
+      }
+      return row;
+    }
+
+    function epicName(epic, folded) {
+      const wrap = document.createElement("div");
+      wrap.className = "name-inner";
+      const fold = document.createElement("button");
+      fold.type = "button";
+      fold.className = "fold";
+      fold.setAttribute("aria-expanded", folded ? "false" : "true");
+      fold.setAttribute("aria-label", (folded ? "Unfold " : "Fold ") + epic.name);
+      const chevron = document.createElement("span");
+      chevron.className = "chevron";
+      chevron.setAttribute("aria-hidden", "true");
+      fold.append(chevron);
+      fold.addEventListener("click", () => toggleEpic(epic.id));
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = epic.name;
+      label.title = epic.name;
+      label.addEventListener("click", () => toggleEpic(epic.id));
+      wrap.append(fold, label);
+      const tasks = epic.items.filter((item) => item.kind === "task");
+      const shown = tasks.filter((item) => taskShown(item)).length;
+      if (tasks.length && (folded || shown !== tasks.length)) {
+        const count = document.createElement("span");
+        count.className = "count";
+        count.textContent = shown === tasks.length ? String(tasks.length) : shown + "/" + tasks.length;
+        count.title = shown + " of " + tasks.length + " tasks shown";
+        wrap.append(count);
+      }
+      if (!VIEWER) {
+        const add = document.createElement("button");
+        add.type = "button";
+        add.className = "add";
+        add.textContent = "Add task";
+        add.setAttribute("aria-label", "Add task to " + epic.name);
+        add.addEventListener("click", () => addTask(epic.id));
+        wrap.append(add);
+      }
+      return wrap;
+    }
+
+    function toggleEpic(id) {
+      if (state.folded.has(id)) state.folded.delete(id);
+      else state.folded.add(id);
+      preserveRender();
+    }
+
+    function preserveRender() {
+      if (!state.roadmap) return;
+      const top = scrollerEl.scrollTop;
+      const left = scrollerEl.scrollLeft;
+      renderBody();
+      scrollerEl.scrollTop = top;
+      scrollerEl.scrollLeft = left;
+    }
+
+    function syncFilterButtons() {
+      for (const [value] of STATUSES) {
+        const button = document.querySelector('button.pill[data-status="' + value + '"]');
+        if (button) button.setAttribute("aria-pressed", String(statusVisible(value)));
+      }
+    }
+
+    function applyStatusFilter(status) {
+      if (state.statuses.size === 0) state.statuses.add(status);
+      else if (state.statuses.has(status)) state.statuses.delete(status);
+      else {
+        state.statuses.add(status);
+        if (state.statuses.size === STATUSES.length) state.statuses.clear();
+      }
+      syncFilterButtons();
+    }
+
+    function ensureStatusShown(status) {
+      if (statusVisible(status)) return;
+      state.statuses.add(status);
+      if (state.statuses.size === STATUSES.length) state.statuses.clear();
+      syncFilterButtons();
+    }
+
+    function taskRow(task, data, epicId) {
+      const row = document.createElement("tr");
+      row.className = "task status-" + task.status;
+      row.dataset.id = task.id;
+      row.dataset.epic = epicId;
+      row.append(nameCell(taskName(task)));
+      for (const sprint of data.sprints) {
+        const cell = document.createElement("td");
+        cell.className = "sprint " + barEdges(task.start, task.end, sprint.id) + sprintFlags(sprint, data);
+        if (state.anchor && state.anchor.itemId === task.id && state.anchor.sprintId === sprint.id) {
+          cell.classList.add("anchor");
+        }
+        cell.dataset.item = task.id;
+        cell.dataset.sprint = sprint.id;
+        cell.title = sprintLabel(sprint.id) + " – " + sprintLabel(sprint.last_day);
+        const mark = document.createElement("span");
+        mark.className = "mark";
+        cell.append(mark);
+        row.append(cell);
+      }
+      return row;
+    }
+
+    function taskName(task) {
+      const wrap = document.createElement("div");
+      wrap.className = "name-inner";
+      if (VIEWER) {
+        const status = document.createElement("span");
+        status.className = "status";
+        status.dataset.status = task.status;
+        status.textContent = STATUSES.find((item) => item[0] === task.status)[1];
+        const name = document.createElement("span");
+        name.className = "task-label";
+        name.textContent = task.name;
+        name.title = task.name;
+        wrap.append(status, name);
+        return wrap;
+      }
+      const grip = document.createElement("button");
+      grip.type = "button";
+      grip.className = "grip";
+      grip.title = "Drag to reorder or move to another epic";
+      grip.setAttribute("aria-label", "Drag " + task.name);
+      const dots = document.createElement("span");
+      dots.className = "grip-dots";
+      dots.setAttribute("aria-hidden", "true");
+      grip.append(dots);
+      grip.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0) return;
+        event.preventDefault();
+        onGripDown(event, task.id);
+      });
+      const select = document.createElement("select");
+      select.className = "status";
+      select.dataset.status = task.status;
+      select.setAttribute("aria-label", "Status for " + task.name);
+      for (const [value, label] of STATUSES) {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        select.append(option);
+      }
+      select.value = task.status;
+      select.addEventListener("change", () => {
+        select.dataset.status = select.value;
+        savePatch(task.id, { status: select.value });
+      });
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "name";
+      button.dataset.id = task.id;
+      button.textContent = task.name;
+      button.title = task.name;
+      button.setAttribute("aria-label", "Rename " + task.name);
+      button.addEventListener("click", () => beginEdit(button));
+      wrap.append(grip, select, button);
+      return wrap;
+    }
+
+    function beginEdit(button) {
+      const id = button.dataset.id;
+      const original = button.textContent;
+      const input = document.createElement("input");
+      input.className = "name";
+      input.value = original;
+      input.spellcheck = false;
+      input.setAttribute("aria-label", "Task name");
+      button.replaceWith(input);
+      input.focus();
+      input.select();
+      let closed = false;
+      function finish(save) {
+        if (closed) return;
+        closed = true;
+        const next = input.value.trim();
+        if (!save || next === original) {
+          renderBody();
+          return;
+        }
+        if (!next) {
+          showError("A task name cannot be empty.");
+          renderBody();
+          return;
+        }
+        savePatch(id, { name: next });
+      }
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          finish(true);
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          finish(false);
+        }
+      });
+      input.addEventListener("blur", () => finish(true));
+    }
+
+    function milestoneSection(items, data) {
+      const folded = state.folded.has("milestones");
+      const fragment = document.createDocumentFragment();
+      const row = document.createElement("tr");
+      row.className = "epic" + (folded ? " folded" : "");
+      row.append(nameCell(milestoneHead(items, folded)));
+      const gems = new Map();
+      if (folded) {
+        for (const item of items) {
+          if (!item.date) continue;
+          const sprintId = sprintForDate(data.sprints, item.date);
+          if (!sprintId) continue;
+          const names = gems.get(sprintId) || [];
+          names.push(item.name);
+          gems.set(sprintId, names);
+        }
+      }
+      for (const sprint of data.sprints) {
+        const cell = document.createElement("td");
+        cell.className = "sprint" + sprintFlags(sprint, data);
+        const names = gems.get(sprint.id);
+        if (names) {
+          const gem = document.createElement("span");
+          gem.className = "gem";
+          gem.title = names.join(", ");
+          cell.append(gem);
+        }
+        row.append(cell);
+      }
+      fragment.append(row);
+      if (!folded) {
+        for (const item of items) fragment.append(milestoneRow(item, data));
+      }
+      return fragment;
+    }
+
+    function milestoneHead(items, folded) {
+      const wrap = document.createElement("div");
+      wrap.className = "name-inner";
+      const fold = document.createElement("button");
+      fold.type = "button";
+      fold.className = "fold";
+      fold.setAttribute("aria-expanded", folded ? "false" : "true");
+      fold.setAttribute("aria-label", (folded ? "Unfold " : "Fold ") + "Milestones");
+      const chevron = document.createElement("span");
+      chevron.className = "chevron";
+      chevron.setAttribute("aria-hidden", "true");
+      fold.append(chevron);
+      fold.addEventListener("click", () => toggleEpic("milestones"));
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = "Milestones";
+      label.title = "Milestones";
+      label.addEventListener("click", () => toggleEpic("milestones"));
+      wrap.append(fold, label);
+      if (folded) {
+        const count = document.createElement("span");
+        count.className = "count";
+        count.textContent = String(items.length);
+        count.title = items.length === 1 ? "1 milestone" : items.length + " milestones";
+        wrap.append(count);
+      }
+      return wrap;
+    }
+
+    function milestoneRow(item, data) {
+      const row = document.createElement("tr");
+      row.className = "milestone";
+      row.dataset.id = item.id;
+      const wrap = document.createElement("div");
+      wrap.className = "name-inner";
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = "Milestone";
+      const label = document.createElement("span");
+      label.className = "label";
+      label.textContent = item.name;
+      label.title = !VIEWER && !item.date ? "Click a sprint to place " + item.name : item.name;
+      wrap.append(tag, label);
+      if (item.date && !VIEWER) {
+        const clear = document.createElement("button");
+        clear.type = "button";
+        clear.className = "clear";
+        clear.textContent = "Clear";
+        clear.setAttribute("aria-label", "Clear date for " + item.name);
+        clear.addEventListener("click", () => savePatch(item.id, { date: null }));
+        wrap.append(clear);
+      }
+      row.append(nameCell(wrap));
+      const placed = sprintForDate(data.sprints, item.date);
+      for (const sprint of data.sprints) {
+        const cell = plainCell(sprint, data);
+        cell.dataset.item = item.id;
+        cell.dataset.sprint = sprint.id;
+        cell.title = sprintLabel(sprint.id) + " – " + sprintLabel(sprint.last_day);
+        if (placed === sprint.id) {
+          const gem = document.createElement("span");
+          gem.className = "gem";
+          gem.title = item.date;
+          cell.append(gem);
+        }
+        row.append(cell);
+      }
+      return row;
+    }
+
+    function nameCell(child) {
+      const cell = document.createElement("td");
+      cell.className = "name-col";
+      cell.append(child);
+      return cell;
+    }
+
+    function plainCell(sprint, data) {
+      const cell = document.createElement("td");
+      cell.className = "sprint" + sprintFlags(sprint, data);
+      return cell;
+    }
+
+    function sprintForDate(sprints, iso) {
+      if (!iso) return null;
+      for (const sprint of sprints) {
+        if (sprint.id <= iso && iso <= sprint.last_day) return sprint.id;
+      }
+      return null;
+    }
+
+    function syncSprintButtons() {
+      for (const button of headEl.querySelectorAll("button.sprint-filter")) {
+        button.setAttribute("aria-pressed", String(button.dataset.sprint === state.sprintId));
+      }
+      for (const cell of headEl.querySelectorAll("th.sprint")) {
+        cell.classList.toggle("picked", cell.dataset.sprint === state.sprintId);
+      }
+      const label = document.getElementById("sprint-filter-label");
+      if (!label) return;
+      label.textContent = state.sprintId ? "Current sprint: " + sprintLabel(state.sprintId) : "Current sprint";
+      label.classList.toggle("on", !!state.sprintId);
+    }
+
+    function renderBody() {
+      buildBody(state.roadmap);
+      syncSprintButtons();
+    }
+
+    function longDate(iso) {
+      const [year, month, day] = iso.split("-");
+      return Number(day) + " " + MONTHS[Number(month) - 1] + " " + year;
+    }
+
+    function render() {
+      const data = state.roadmap;
+      document.title = data.title;
+      titleEl.textContent = data.title;
+      const asOf = document.getElementById("as-of");
+      if (VIEWER && data.today) {
+        asOf.hidden = false;
+        asOf.textContent = "Schedule as of " + longDate(data.today);
+      }
+      buildHead(data);
+      renderBody();
+      if (!state.scrolled) {
+        const current = headEl.querySelector("th.sprint.current");
+        if (current) {
+          const left = current.getBoundingClientRect().left - scrollerEl.getBoundingClientRect().left;
+          scrollerEl.scrollLeft = scrollerEl.scrollLeft + left - 380 - 24;
+        }
+        const row = [...bodyEl.querySelectorAll("tr.task")].find((item) => item.querySelector("td.current.in-bar"));
+        if (row) {
+          const top = row.getBoundingClientRect().top - scrollerEl.getBoundingClientRect().top;
+          scrollerEl.scrollTop += top - 48;
+        }
+        state.scrolled = true;
+      }
+    }
+
+    async function savePatch(id, body) {
+      const top = scrollerEl.scrollTop;
+      const left = scrollerEl.scrollLeft;
+      document.body.classList.add("saving");
+      try {
+        state.roadmap = await api("PATCH", "/api/items/" + encodeURIComponent(id), body);
+        clearError();
+      } catch (error) {
+        showError(error.message);
+        try { state.roadmap = await api("GET", "/api/roadmap"); } catch { /* keep the last good copy */ }
+      } finally {
+        document.body.classList.remove("saving");
+        renderBody();
+        scrollerEl.scrollTop = top;
+        scrollerEl.scrollLeft = left;
+      }
+    }
+
+    async function addTask(epicId) {
+      const top = scrollerEl.scrollTop;
+      const left = scrollerEl.scrollLeft;
+      document.body.classList.add("saving");
+      try {
+        state.roadmap = await api("POST", "/api/epics/" + encodeURIComponent(epicId) + "/tasks");
+        clearError();
+      } catch (error) {
+        showError(error.message);
+        return;
+      } finally {
+        document.body.classList.remove("saving");
+      }
+      const epic = state.roadmap.epics.find((item) => item.id === epicId);
+      const created = epic.items[epic.items.length - 1];
+      state.folded.delete(epicId);
+      ensureStatusShown(created.status);
+      renderBody();
+      scrollerEl.scrollTop = top;
+      scrollerEl.scrollLeft = left;
+      const row = bodyEl.querySelector('tr[data-id="' + CSS.escape(created.id) + '"]');
+      if (!row) return;
+      row.classList.add("flash");
+      const bounds = row.getBoundingClientRect();
+      const frame = scrollerEl.getBoundingClientRect();
+      if (bounds.top < frame.top || bounds.bottom > frame.bottom) {
+        scrollerEl.scrollTop += bounds.top - frame.top - 80;
+      }
+      const button = row.querySelector("button.name");
+      if (button) beginEdit(button);
+    }
+
+    const drag = {
+      pointer: null,
+      id: null,
+      handle: null,
+      startX: 0,
+      startY: 0,
+      lastY: null,
+      active: false,
+      ghost: null,
+      target: null,
+      scrollTimer: null
+    };
+
+    function onGripDown(event, taskId) {
+      if (document.body.classList.contains("saving") || drag.pointer !== null) return;
+      drag.pointer = event.pointerId;
+      drag.id = taskId;
+      drag.handle = event.currentTarget;
+      drag.startX = event.clientX;
+      drag.startY = event.clientY;
+      drag.active = false;
+      try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* the pointer is already gone */ }
+      document.addEventListener("pointermove", onGripMove);
+      document.addEventListener("pointerup", onGripUp);
+      document.addEventListener("pointercancel", onGripUp);
+    }
+
+    function onGripMove(event) {
+      if (event.pointerId !== drag.pointer) return;
+      const dx = event.clientX - drag.startX;
+      const dy = event.clientY - drag.startY;
+      if (!drag.active) {
+        if (dx * dx + dy * dy < 25) return;
+        beginDrag(event);
+      }
+      event.preventDefault();
+      drag.lastY = event.clientY;
+      placeGhost(event.clientX, event.clientY);
+      autoScroll(event.clientY);
+      showDrop(dropAt(event.clientY));
+    }
+
+    function beginDrag(event) {
+      drag.active = true;
+      state.anchor = null;
+      document.body.classList.add("dragging");
+      const row = taskRowEl(drag.id);
+      if (row) row.classList.add("dragging");
+      const ghost = document.createElement("div");
+      ghost.className = "drag-ghost";
+      const task = findItem(drag.id);
+      ghost.textContent = task ? task.name : "Task";
+      document.body.append(ghost);
+      drag.ghost = ghost;
+      placeGhost(event.clientX, event.clientY);
+      drag.scrollTimer = setInterval(() => {
+        if (drag.lastY == null) return;
+        autoScroll(drag.lastY);
+        showDrop(dropAt(drag.lastY));
+      }, 32);
+    }
+
+    function placeGhost(x, y) {
+      if (!drag.ghost) return;
+      drag.ghost.style.left = (x + 14) + "px";
+      drag.ghost.style.top = (y + 14) + "px";
+    }
+
+    function autoScroll(y) {
+      const frame = scrollerEl.getBoundingClientRect();
+      if (y < frame.top + 36) scrollerEl.scrollTop -= 14;
+      else if (y > frame.bottom - 28) scrollerEl.scrollTop += 14;
+    }
+
+    function taskRowEl(id) {
+      return bodyEl.querySelector('tr.task[data-id="' + CSS.escape(id) + '"]');
+    }
+
+    function clearDrop() {
+      bodyEl.querySelectorAll("tr.drop-before, tr.drop-after").forEach((row) => {
+        row.classList.remove("drop-before", "drop-after");
+      });
+    }
+
+    function showDrop(target) {
+      clearDrop();
+      drag.target = target;
+      if (!target) return;
+      target.row.classList.add(target.place === "before" ? "drop-before" : "drop-after");
+    }
+
+    function dropRows() {
+      return [...bodyEl.querySelectorAll("tr.epic[data-epic], tr.task[data-epic]")]
+        .filter((row) => row.dataset.epic !== "milestones");
+    }
+
+    function startOfEpic(row) {
+      const epic = state.roadmap.epics.find((item) => item.id === row.dataset.epic);
+      const first = epic.items.find((item) => item.kind === "task" && item.id !== drag.id);
+      return { row, place: "before", epic: epic.id, before: first ? first.id : null };
+    }
+
+    function endOfEpic(row) {
+      return { row, place: "after", epic: row.dataset.epic, before: null };
+    }
+
+    function beforeTask(row) {
+      return { row, place: "before", epic: row.dataset.epic, before: row.dataset.id };
+    }
+
+    function afterTask(row) {
+      const epic = state.roadmap.epics.find((item) => item.id === row.dataset.epic);
+      const tasks = epic.items.filter((item) => item.kind === "task");
+      const index = tasks.findIndex((item) => item.id === row.dataset.id);
+      let before = null;
+      for (let cursor = index + 1; cursor < tasks.length; cursor += 1) {
+        if (tasks[cursor].id !== drag.id) {
+          before = tasks[cursor].id;
+          break;
+        }
+      }
+      return { row, place: "after", epic: epic.id, before };
+    }
+
+    function dropAt(y) {
+      const rows = dropRows();
+      if (!rows.length) return null;
+      for (const row of rows) {
+        const box = row.getBoundingClientRect();
+        if (y >= box.bottom) continue;
+        const mid = box.top + box.height / 2;
+        if (row.classList.contains("epic")) {
+          if (row.classList.contains("folded") && y >= mid) return endOfEpic(row);
+          return startOfEpic(row);
+        }
+        return y < mid ? beforeTask(row) : afterTask(row);
+      }
+      const last = rows[rows.length - 1];
+      return last.classList.contains("task") ? afterTask(last) : endOfEpic(last);
+    }
+
+    function samePlace(id, target) {
+      if (!target || target.before === id) return true;
+      const epic = state.roadmap.epics.find((item) => item.items.some((task) => task.id === id));
+      if (!epic || epic.id !== target.epic) return false;
+      const tasks = epic.items.filter((item) => item.kind === "task");
+      const index = tasks.findIndex((item) => item.id === id);
+      if (target.before == null) return index === tasks.length - 1;
+      return tasks[index + 1] && tasks[index + 1].id === target.before;
+    }
+
+    function endDrag() {
+      document.removeEventListener("pointermove", onGripMove);
+      document.removeEventListener("pointerup", onGripUp);
+      document.removeEventListener("pointercancel", onGripUp);
+      if (drag.scrollTimer) clearInterval(drag.scrollTimer);
+      if (drag.ghost) drag.ghost.remove();
+      clearDrop();
+      document.body.classList.remove("dragging");
+      const row = drag.id ? taskRowEl(drag.id) : null;
+      if (row) row.classList.remove("dragging");
+      drag.pointer = null;
+      drag.id = null;
+      drag.handle = null;
+      drag.active = false;
+      drag.ghost = null;
+      drag.target = null;
+      drag.scrollTimer = null;
+      drag.lastY = null;
+    }
+
+    function onGripUp(event) {
+      if (event.pointerId !== drag.pointer) return;
+      const active = drag.active;
+      const id = drag.id;
+      const target = drag.target;
+      endDrag();
+      if (!active || !id || !target || samePlace(id, target)) return;
+      state.anchor = null;
+      state.folded.delete(target.epic);
+      saveMove(id, { epic: target.epic, before: target.before });
+    }
+
+    async function saveMove(id, body) {
+      const top = scrollerEl.scrollTop;
+      const left = scrollerEl.scrollLeft;
+      document.body.classList.add("saving");
+      try {
+        state.roadmap = await api("POST", "/api/items/" + encodeURIComponent(id) + "/move", body);
+        clearError();
+      } catch (error) {
+        showError(error.message);
+        try { state.roadmap = await api("GET", "/api/roadmap"); } catch { /* keep the last good copy */ }
+      } finally {
+        document.body.classList.remove("saving");
+        renderBody();
+        scrollerEl.scrollTop = top;
+        scrollerEl.scrollLeft = left;
+      }
+    }
+
+    function onSprintClick(cell) {
+      if (VIEWER) return;
+      const itemId = cell.dataset.item;
+      const sprintId = cell.dataset.sprint;
+      if (!itemId || document.body.classList.contains("saving")) return;
+      const item = findItem(itemId);
+      if (item && item.kind === "milestone") {
+        if (sprintForDate(state.roadmap.sprints, item.date) === sprintId) return;
+        state.anchor = null;
+        savePatch(itemId, { date: sprintId });
+        return;
+      }
+      if (!state.anchor || state.anchor.itemId !== itemId) {
+        state.anchor = { itemId, sprintId };
+        renderBody();
+        return;
+      }
+      const task = findItem(itemId);
+      const start = state.anchor.sprintId < sprintId ? state.anchor.sprintId : sprintId;
+      const end = state.anchor.sprintId < sprintId ? sprintId : state.anchor.sprintId;
+      state.anchor = null;
+      if (task && task.start === start && task.end === end) {
+        renderBody();
+        return;
+      }
+      savePatch(itemId, { start, end });
+    }
+
+    function preview(cell) {
+      bodyEl.querySelectorAll("td.preview").forEach((item) => item.classList.remove("preview"));
+      if (VIEWER || !cell || !cell.dataset.item) return;
+      const item = findItem(cell.dataset.item);
+      if (item && item.kind === "milestone") {
+        cell.classList.add("preview");
+        return;
+      }
+      if (!state.anchor || cell.dataset.item !== state.anchor.itemId) return;
+      const sprintId = cell.dataset.sprint;
+      const start = state.anchor.sprintId < sprintId ? state.anchor.sprintId : sprintId;
+      const end = state.anchor.sprintId < sprintId ? sprintId : state.anchor.sprintId;
+      bodyEl.querySelectorAll('td.sprint[data-item="' + CSS.escape(state.anchor.itemId) + '"]').forEach((item) => {
+        if (item.dataset.sprint >= start && item.dataset.sprint <= end) item.classList.add("preview");
+      });
+    }
+
+    bodyEl.addEventListener("click", (event) => {
+      const cell = event.target.closest("td.sprint");
+      if (cell && bodyEl.contains(cell)) onSprintClick(cell);
+    });
+    bodyEl.addEventListener("mouseover", (event) => {
+      preview(event.target.closest("td.sprint"));
+    });
+    bodyEl.addEventListener("mouseleave", () => preview(null));
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && drag.active) {
+        endDrag();
+        return;
+      }
+      if (event.key === "Escape" && state.anchor && document.activeElement.tagName !== "INPUT") {
+        state.anchor = null;
+        renderBody();
+      }
+    });
+    document.getElementById("fold-all").addEventListener("click", () => {
+      if (!state.roadmap) return;
+      for (const epic of state.roadmap.epics) state.folded.add(epic.id);
+      preserveRender();
+    });
+    document.getElementById("unfold-all").addEventListener("click", () => {
+      state.folded.clear();
+      preserveRender();
+    });
+    document.querySelectorAll("button.pill").forEach((button) => {
+      button.addEventListener("click", () => {
+        applyStatusFilter(button.dataset.status);
+        preserveRender();
+      });
+    });
+
+    function sealKey() {
+      return "roadmap-view:" + (SEALED && SEALED.data ? SEALED.data.slice(0, 24) : "");
+    }
+
+    function showGate() {
+      document.getElementById("app").hidden = true;
+      document.getElementById("gate").hidden = false;
+      document.getElementById("gate-password").focus();
+    }
+
+    function openRoadmap() {
+      document.getElementById("gate").hidden = true;
+      document.getElementById("app").hidden = false;
+      render();
+    }
+
+    function lockRoadmap() {
+      sessionStorage.removeItem(sealKey());
+      state.roadmap = null;
+      state.anchor = null;
+      state.scrolled = false;
+      clearError();
+      headEl.replaceChildren();
+      bodyEl.replaceChildren();
+      const input = document.getElementById("gate-password");
+      input.value = "";
+      document.getElementById("gate-error").hidden = true;
+      showGate();
+    }
+
+    function bytesFromB64(value) {
+      const binary = atob(value);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+      return bytes;
+    }
+
+    async function unseal(password) {
+      if (!window.crypto || !crypto.subtle) {
+        throw new Error("Open this page on its web address. A file opened from the disk cannot unlock it.");
+      }
+      const material = await crypto.subtle.importKey(
+        "raw",
+        new TextEncoder().encode(password),
+        "PBKDF2",
+        false,
+        ["deriveKey"]
+      );
+      const key = await crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: bytesFromB64(SEALED.salt), iterations: SEALED.iterations, hash: "SHA-256" },
+        material,
+        { name: "AES-GCM", length: 256 },
+        false,
+        ["decrypt"]
+      );
+      const plain = await crypto.subtle.decrypt(
+        { name: "AES-GCM", iv: bytesFromB64(SEALED.iv) },
+        key,
+        bytesFromB64(SEALED.data)
+      );
+      return JSON.parse(new TextDecoder().decode(plain));
+    }
+
+    document.getElementById("gate-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = document.getElementById("gate-password");
+      const message = document.getElementById("gate-error");
+      message.hidden = true;
+      try {
+        state.roadmap = await unseal(input.value);
+        sessionStorage.setItem(sealKey(), JSON.stringify(state.roadmap));
+        input.value = "";
+        openRoadmap();
+      } catch (error) {
+        message.hidden = false;
+        message.textContent = error.message && error.message.indexOf("disk") !== -1
+          ? error.message
+          : "That password is not correct.";
+        input.select();
+      }
+    });
+
+    async function init() {
+      if (VIEWER) {
+        document.body.classList.add("viewer");
+        const lock = document.getElementById("lock");
+        lock.hidden = false;
+        lock.addEventListener("click", lockRoadmap);
+        if (!SEALED) {
+          showError("This view has no schedule.");
+          return;
+        }
+        const cached = sessionStorage.getItem(sealKey());
+        if (cached) {
+          try {
+            state.roadmap = JSON.parse(cached);
+            openRoadmap();
+            return;
+          } catch {
+            sessionStorage.removeItem(sealKey());
+          }
+        }
+        showGate();
+        return;
+      }
+      try {
+        state.roadmap = BOOT || await api("GET", "/api/roadmap");
+        render();
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
